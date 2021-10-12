@@ -11,6 +11,8 @@ let TRAXIVITY_DETAILS = {goal: 0, steps: 0};
 let EMOTIVITY_DETAILS = {status: false, record: {anger: 0, anxiety: 0, happiness: 0, sadness: 0, stress: 0, tired: 0}};
 let DIARY_DETAILS = false;
 let THANKS_DETAILS = false;
+const EMOTIVITY_TODAY_FILLED: string = 'emotivity_today_filled';
+const SAYTHANX_TODAY_FILLED: string = 'saythanx_today_filled';
 
 export class AppStorage {
 
@@ -136,6 +138,42 @@ export class AppStorage {
     return AsyncStorage.setItem(MAPPING_KEY, mapping);
   };
   
+  static markEmotivityTodayCompleted = async(emotivityValue) => {
+    await AsyncStorage.setItem(EMOTIVITY_TODAY_FILLED, JSON.stringify(emotivityValue))
+      .then(() => {})
+      .catch(() => {
+        console.log('Failed to save the emotivityValue to the storage');
+      });
+  };
+
+  static checkEmotivityTodayCompleted = async () => {
+    try {
+      const emotivityValue = await AsyncStorage.getItem(EMOTIVITY_TODAY_FILLED);
+      return JSON.parse(emotivityValue);
+    } catch (error) {
+      console.log('Failed to fetch the emotivityValue from the storage');
+      return false;
+    }
+  };
+
+  static markSayThanxTodayCompleted = async(emotivityValue) => {
+    await AsyncStorage.setItem(SAYTHANX_TODAY_FILLED, JSON.stringify(emotivityValue))
+      .then(() => {})
+      .catch(() => {
+        console.log('Failed to save the SayThanx to the storage');
+      });
+  };
+
+  static checkSayThanxTodayCompleted = async () => {
+    try {
+      const sayThanx = await AsyncStorage.getItem(SAYTHANX_TODAY_FILLED);
+      return JSON.parse(sayThanx);
+    } catch (error) {
+      console.log('Failed to fetch the SayThanx from the storage');
+      return false;
+    }
+  };
+
 }
 
 /**
