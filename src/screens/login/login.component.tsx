@@ -33,6 +33,9 @@ export default class LoginScreen extends Component {
         console.log(firebaseUserCredential.user)
         //this.props.navigation.navigate('Home')
       }
+      console.log("1 IS GOOGLE SIGNED IN START LOG SCREEEEEEEN")
+      console.log(await GoogleSignin.isSignedIn())
+      console.log("1 IS GOOGLE SIGNED IN END LOG SCREEEEEEEN")
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         this.setState({ isLoading: false })

@@ -22,7 +22,9 @@ import { AppInfoService } from '../../services/app-info.service';
 import { AppStorage } from '../../services/app-storage.service';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-community/async-storage';
-import { GoogleSignin } from '@react-native-community/google-signin';
+import { GoogleSignin, statusCodes } from '@react-native-community/google-signin';
+import { UtilService } from '../../services/util.service';
+import RNRestart from 'react-native-restart';
 
 const DATA: MenuItemType[] = [
   { title: 'About Unimate', icon: AboutIcon },
@@ -55,13 +57,6 @@ export const BaseDrawer = ({ navigation }): DrawerElement => {
   };
 
   const userSignOut = async () => {
-    console.log("USER SIGN OUT") 
-    console.log("ASYNC DATA START") 
-
-    console.log("1 IS GOOGLE SIGNED IN START")
-    console.log(await GoogleSignin.isSignedIn())
-    console.log("1 IS GOOGLE SIGNED IN END")
-
     // AsyncStorage.getAllKeys((err, keys) => {
     //   AsyncStorage.multiGet(keys, (error, stores) => {
     //     stores.map((result, i, store) => {
@@ -70,11 +65,35 @@ export const BaseDrawer = ({ navigation }): DrawerElement => {
     //     });
     //   });
     // });
-    await GoogleSignin.signOut();
-  console.log("2 IS GOOGLE SIGNED IN START")
-  console.log(await GoogleSignin.isSignedIn())
-  console.log("2 IS GOOGLE SIGNED IN END")
+    try {
+      await GoogleSignin.configure({
+        scopes: [
+          "https://www.googleapis.com/auth/userinfo.profile",
+          "https://www.googleapis.com/auth/userinfo.email",
+          //"https://www.googleapis.com/auth/fitness.location.read",
+          //"https://www.googleapis.com/auth/fitness.activity.read",
+          //"https://www.googleapis.com/auth/fitness.body.read"
+        ],
+        webClientId: '391105893913-r1ol9fkvnbvgfcpoqgsdqdtvctq46do9.apps.googleusercontent.com'
+      })
+      
+      // console.log(await GoogleSignin.isSignedIn())
+  
+      await auth().signOut().then(function() {
+        console.log('Signed Out');
+      }, function(error) {
+        console.error('Sign Out Error', error);
+      });
+            await GoogleSignin.signOut();
 
+    } 
+    catch (error) {
+      console.log('Rejected');
+      console.log(error)
+    }
+
+//  console.log(await GoogleSignin.isSignedIn())
+  
     AsyncStorage.getAllKeys().then((keyArray) => {
       AsyncStorage.multiGet(keyArray).then((keyValArray) => {
         let myStorage: any = {};
@@ -85,9 +104,6 @@ export const BaseDrawer = ({ navigation }): DrawerElement => {
         console.log('CURRENT STORAGE: ', myStorage);
       })
     });
-  
-    console.log("ASYNC DATA END") 
-
     // await auth().signOut();
     // AppStorage.setUser({});
     // AsyncStorage.clear();
@@ -97,23 +113,20 @@ export const BaseDrawer = ({ navigation }): DrawerElement => {
 
     await AsyncStorage.getAllKeys()
         .then(keys => {
-          console.log("KEY AsyncStorage")
-          console.log(keys)
           AsyncStorage.multiRemove(keys)})
         .then(() => console.log("All local data Removed"));
 
     await userSignOut();
     setVisible(false);
-    // navigation.navigate('Login');
-    // BackHandler.exitApp();
+    RNRestart.Restart();
   }
   
   const keepDataLogout = async () => {
     await userSignOut();
     setVisible(false);
-    // navigation.navigate('Login');
-    // BackHandler.exitApp();
+    RNRestart.Restart();
   }
+
 
   const [visible, setVisible] = React.useState(false);
 
