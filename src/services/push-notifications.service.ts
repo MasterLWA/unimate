@@ -92,8 +92,12 @@ PushNotification.configure({
   //Every day @8PM checks whther the user completed the meotivity questions
   //If he doesnt send a notification
   emotivityCompletionNotification = async () => {
+    let tempNotificatinoList = await AppStorage.getNotificationsList();
+    // let tempNotificatinoList1;
+    console.log("insede 444444")
+
     console.log(new Date(Date.now()).getHours())
-    if (new Date(Date.now()).getHours() == 20) {
+    // if (new Date(Date.now()).getHours() == 20) {
       console.log("INSIDE EMOTIVITY")
       const temp = await AppStorage.checkEmotivityTodayCompleted();
       if (temp == null || !(temp.date == UtilService.getDateToday())) {
@@ -105,16 +109,128 @@ PushNotification.configure({
           date: new Date(Date.now()),
           allowWhileIdle: true,
         });
+        tempNotificatinoList = this.addNotification(tempNotificatinoList,
+                             true,
+                             "You haven't told us about your day yet. Log into the Unimate app to say about your day",
+                             new Date(Date.now()),
+                             '🕙 How is your day today? 😀',
+                             'Emotivity');
+                             console.log("insede 55555")
+                             console.log(tempNotificatinoList)
+                            //  console.log(tempNotificatinoList1)
       }
-    }
+//vihangaaw
+console.log("INSIDE SAY THANKX")
+const temp1 = await AppStorage.checkSayThanxTodayCompleted();
+if (temp1 == null || !(temp1.date == UtilService.getDateToday())) {
+  PushNotification.localNotificationSchedule({
+    channelId: 'reminders',
+    title: '🕙 Say thanks to someone 🙏',
+    message: 'Log into the Unimate app to say thanks to someone',
+    date: new Date(Date.now()),
+    allowWhileIdle: true,
+  });
+  tempNotificatinoList = this.addNotification(tempNotificatinoList,
+                                              true,
+                                              "Log into the Unimate app to say thanks to someone",
+                                              new Date(Date.now()),
+                                              '🕙 Say thanks to someone 🙏',
+                                              'SayThanx');
+                                              console.log("insede 6666666")
+                                              console.log(tempNotificatinoList)
+                                              // console.log(tempNotificatinoList1)
+
+}
+
+
+
+console.log("INSIDE TRAXIVITY")
+var start = new Date();
+var end = new Date();
+var nbDays = start.getDay();
+if (nbDays == 0) nbDays = 7;
+start.setDate(start.getDate() - (nbDays - 1));
+start.setHours(0, 0, 0, 0);
+end.setHours(23, 59, 59, 999);
+
+const options = {
+  startDate: start,
+  endDate: end,
+};
+
+getSteps(options, null, res => {
+  const reducer = (accumulator, currentValue) =>
+    accumulator + currentValue;
+
+  var tabStep = res.map(x => x.value);
+
+  var stepSum = 0;
+  var StepAvg = 0;
+
+  if (tabStep.length > 0) {
+    stepSum = tabStep.reduce(reducer);
+    StepAvg = stepSum / tabStep.length;
+  }
+
+  if (StepAvg < AppStorage.getTraxivityDetails().goal) {
+    PushNotification.localNotificationSchedule({
+      channelId: 'reminders',
+      title: '🕙 Traxivity 🏃',
+      message:
+        'Seems like you were unable to reach the goal past week. You can change the goal to a lower value',
+      date: new Date(Date.now()),
+      allowWhileIdle: true,
+    });
+    tempNotificatinoList =  this.addNotification(tempNotificatinoList,
+                                                true,
+                                                "Seems like you were unable to reach the goal past week. You can change the goal to a lower value",
+                                                new Date(Date.now()),
+                                                '🕙 Traxivity',
+                                                'Traxivity');
+                                                console.log("7777777")
+                                                console.log(tempNotificatinoList)
+                                                // console.log(tempNotificatinoList1)
+  } else {
+    PushNotification.localNotificationSchedule({
+      channelId: 'reminders',
+      title: '🕙 Traxivity 🏃',
+      message:
+        'Seems like you were able to reach the goal past week. You can change the goal to a higher value',
+      date: new Date(Date.now()),
+      allowWhileIdle: true,
+    });
+    console.log("insede 333333333")
+
+    tempNotificatinoList = this.addNotification(tempNotificatinoList,
+                                                true,
+                                                "Seems like you were able to reach the goal past week. You can change the goal to a higher value",
+                                                new Date(Date.now()),
+                                                '🕙 Traxivity',
+                                                'Traxivity');
+
+  }
+});
+
+//vihangaaw
+console.log("insede 22222222")
+// console.log(tempNotificatinoList1)
+console.log(tempNotificatinoList)
+
+if(tempNotificatinoList.length>0){
+  console.log("insede 11111111111")
+  AppStorage.saveNotificationsList(tempNotificatinoList);
+}
+    // }
   };
+
+
 
   //SayThanx related notifications
   //Every day @8PM checks whther the user completed the meotivity questions
   //If he doenst send a notification
   sayThanxCompletionNotification = async () => {
     console.log(new Date(Date.now()).getHours())
-    if (new Date(Date.now()).getHours() == 20) {
+    // if (new Date(Date.now()).getHours() == 20) {
       console.log("INSIDE SAY THANKX")
       const temp = await AppStorage.checkSayThanxTodayCompleted();
       if (temp == null || !(temp.date == UtilService.getDateToday())) {
@@ -126,14 +242,14 @@ PushNotification.configure({
           allowWhileIdle: true,
         });
       }
-    }
+    // }
   };
 
   //Traxivity related notifications
   //Weekly check whether the average
   traxivityCompletionNotification = () => {
     console.log(new Date(Date.now()).getHours())
-    if (new Date(Date.now()).getHours() == 20) {
+    // if (new Date(Date.now()).getHours() == 20) {
       console.log("INSIDE TRAXIVITY")
       var start = new Date();
       var end = new Date();
@@ -182,8 +298,35 @@ PushNotification.configure({
           });
         }
       });
+    // }
+  };
+
+
+  addNotification =  (currentArr, isImportant, subtitle, timestamp, title, type) => {
+    console.log("INSIDE METHOD ARRAY START")
+console.log(currentArr)
+console.log(currentArr.length)
+    console.log("INSIDE METHOD ARRAY END")
+    if (currentArr != null && currentArr.length > 0) {
+      const userInput = [{isImportant: isImportant, subtitle: subtitle, timestamp:timestamp, title:title, type:type}];
+      const updatedArr = userInput.concat(currentArr);
+     // await AppStorage.saveNotificationsList(updatedArr);
+      // setTodoItems(updatedArr);
+      console.log("updateAttr")
+      console.log(updatedArr)
+
+      return updatedArr;
+    } else {
+      const tempIni = [{isImportant: isImportant, subtitle: subtitle, timestamp:timestamp, title:title, type:type}];
+     // await AppStorage.saveNotificationsList(tempIni);
+      // setTodoItems(tempIni);
+      console.log("tempIni")
+      console.log(tempIni)
+
+      return tempIni;
     }
   };
+
 }
 
 /**

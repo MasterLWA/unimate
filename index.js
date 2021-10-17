@@ -25,8 +25,8 @@ let PushNotificationsHeadlessTask = async event => {
   console.log('[BackgroundFetch HeadlessTask] start: ', taskId);
   // let pushNotifications = await PushNotifications();
   await pushNotifications.emotivityCompletionNotification();
-  await pushNotifications.sayThanksCompletionNotification();
-  await pushNotifications.traxivityCompletionNotification();
+  // await pushNotifications.sayThanksCompletionNotification();
+  // await pushNotifications.traxivityCompletionNotification();
 
   // Perform an example HTTP request.
   // Important:  await asychronous tasks when using HeadlessJS.

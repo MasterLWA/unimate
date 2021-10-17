@@ -13,6 +13,7 @@ let DIARY_DETAILS = false;
 let THANKS_DETAILS = false;
 const EMOTIVITY_TODAY_FILLED: string = 'emotivity_today_filled';
 const SAYTHANX_TODAY_FILLED: string = 'saythanx_today_filled';
+const NOTIFICATIONS_KEY: string = 'notifications_key'
 
 export class AppStorage {
 
@@ -173,6 +174,27 @@ export class AppStorage {
       return false;
     }
   };
+
+
+// Notifications
+static saveNotificationsList = async notificationsList => {
+  await AsyncStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notificationsList))
+    .then(() => {})
+    .catch(() => {
+      console.log('Failed to save the Notifications List to the storage');
+    });
+};
+
+static getNotificationsList = async () => {
+  try {
+    const notificationsList = await AsyncStorage.getItem(NOTIFICATIONS_KEY);
+    return JSON.parse(notificationsList);
+  } catch (error) {
+    console.log('Failed to save the Notifications List to the storage');
+    return false;
+  }
+};
+
 
 }
 
